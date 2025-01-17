@@ -1,1 +1,43 @@
+letters = 'abcdefghijklmnopqrstuvwxyz'
+num_letters = len(letters)
+def encrypt_decrypt(text, mode, key):
+    result = ''
+    # Adjust key for decryption
+    if mode == 'd':
+        key = -key
+    for letter in text:
+        if letter.isalpha():  # Only process alphabetic characters
+            is_upper = letter.isupper()
+            letter = letter.lower()  # Work with lowercase for simplicity
+            index = letters.find(letter)
+            new_index = (index + key) % num_letters
+            new_letter = letters[new_index]
+            result += new_letter.upper() if is_upper else new_letter
+        else:
+            result += letter  # Retain spaces and non-alphabetic characters
+    return result
+print('\n*** CAESAR CIPHER PROGRAM ***\n')
+while True:
+    user_input = input('Do you want to encrypt or decrypt? (e/d): ').lower()
+    if user_input in ['e', 'd']:
+        break
+    print("Invalid input. Please enter 'e' for encrypt or 'd' for decrypt.")
+while True:
+    try:
+        key = int(input('Enter the key (1 through 26): '))
+        if 1 <= key <= 26:
+            break
+        else:
+            print("Key must be between 1 and 26.")
+    except ValueError:
+        print("Invalid input. Please enter a number between 1 and 26.")
+text = input('Enter the text: ')
+if user_input == 'e':
+    print('\nENCRYPTION MODE SELECTED')
+    result = encrypt_decrypt(text, 'e', key)
+    print(f'CIPHERTEXT: {result}')
+elif user_input == 'd':
+    print('\nDECRYPTION MODE SELECTED')
+    result = encrypt_decrypt(text, 'd', key)
+    print(f'PLAINTEXT: {result}')
 
