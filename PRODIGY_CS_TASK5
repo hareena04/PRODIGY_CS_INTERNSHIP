@@ -1,0 +1,53 @@
+import scapy.all as scapy
+
+def packet_callback(packet):
+    """
+    Callback function for handling sniffed packets.
+    """
+    if packet.haslayer(scapy.IP):  # Check if the packet contains an IP layer
+        src_ip = packet[scapy.IP].src
+        dst_ip = packet[scapy.IP].dst
+        protocol = packet[scapy.IP].proto
+        
+        print(f"[IP] Source: {src_ip} -> Destination: {dst_ip} | Protocol: {protocol}")
+
+        # Handle TCP packets
+        if packet.haslayer(scapy.TCP):
+            print("[TCP] TCP packet detected.")
+            if packet.haslayer(scapy.Raw):  # Check for raw payload
+                try:
+                    payload = packet[scapy.Raw].load
+                    decoded_payload = payload.decode('utf-8', 'ignore')  # Decode with error handling
+                    print(f"  [Payload] TCP Data: {decoded_payload}")
+                except UnicodeDecodeError:
+                    print("  [Error] Unable to decode TCP payload.")
+
+        # Handle UDP packets
+        elif packet.haslayer(scapy.UDP):
+            print("[UDP] UDP packet detected.")
+            if packet.haslayer(scapy.Raw):  # Check for raw payload
+                try:
+                    payload = packet[scapy.Raw].load
+                    decoded_payload = payload.decode('utf-8', 'ignore')  # Decode with error handling
+                    print(f"  [Payload] UDP Data: {decoded_payload}")
+                except UnicodeDecodeError:
+                    print("  [Error] Unable to decode UDP payload.")
+
+def start_sniffing(interface=None):
+    """
+    Starts the packet sniffing process on the specified interface.
+    
+    :param interface: Network interface to sniff packets on. Sniffs on all interfaces if None.
+    """
+    try:
+        print("Starting packet sniffing...")
+        scapy.sniff(store=False, prn=packet_callback, iface=interface)
+    except PermissionError:
+        print("[Error] Permission denied. Please run the script with elevated privileges (e.g., as root).")
+    except Exception as e:
+        print(f"[Error] An unexpected error occurred: {e}")
+
+if __name__ == "__main__":
+    # Replace 'eth0' with the name of the network interface to sniff (or leave as None for all interfaces)
+    sniff_interface = None  # e.g., "eth0", "wlan0", etc.
+    start_sniffing(sniff_interface)
