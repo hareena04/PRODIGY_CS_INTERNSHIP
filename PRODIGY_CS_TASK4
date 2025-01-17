@@ -1,0 +1,30 @@
+try:
+    # Get user inputs
+    path = input(r"Enter the path of the image file: ").strip()
+    key = int(input("Enter a numeric key for encryption: "))
+    print(f"The path of the file: {path}")
+    print("Note: The encryption and decryption key must be the same.")
+    print(f"Key for decryption: {key}")
+
+    # Open the file in binary read mode
+    with open(path, 'rb') as fin:
+        image = bytearray(fin.read())
+
+    # Perform XOR encryption
+    for index, value in enumerate(image):
+        image[index] = value ^ key
+
+    # Write the encrypted image back to the file
+    with open(path, 'wb') as fout:
+        fout.write(image)
+
+    print("Encryption Done Successfully.")
+
+except FileNotFoundError:
+    print("Error: The file was not found. Please check the path and try again.")
+
+except ValueError:
+    print("Error: Invalid input. Please enter a valid numeric key.")
+
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
